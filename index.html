@@ -1978,10 +1978,10 @@
                     todayNextNationalIcon.textContent = icon;
                 }
 
-                // Schedule reminder notifications for the next national event
+                // Schedule reminder notification for the next national event
                 const reminderId = nextName === nationalEvents.saudiNationalDay.name ? 'national-day' : 'national-founding';
 
-                // 1) قبل المناسبة بثلاثة أيام (إن أمكن)
+                // فقط قبل المناسبة بثلاثة أيام (إن أمكن)
                 if (nextDays >= 3) {
                     scheduleEventReminder(
                         `national-${reminderId}-3days`,
@@ -1990,14 +1990,6 @@
                         nextDays - 3
                     );
                 }
-
-                // 2) في يوم المناسبة نفسه
-                scheduleEventReminder(
-                    `national-${reminderId}-day`,
-                    'تذكير مناسبة وطنية',
-                    `${nextName} اليوم بإذن الله`,
-                    nextDays
-                );
             }
         }
 
@@ -2123,8 +2115,8 @@
                             }
                         }
 
-                        // Schedule reminder notifications for the next Islamic event
-                        // 1) قبل المناسبة بثلاثة أيام (إن أمكن)
+                        // Schedule reminder notification for the next Islamic event
+                        // فقط قبل المناسبة بثلاثة أيام (إن أمكن)
                         if (nextEvent.daysUntil >= 3) {
                             scheduleEventReminder(
                                 `islamic-${nextEvent.key}-3days`,
@@ -2133,14 +2125,6 @@
                                 nextEvent.daysUntil - 3
                             );
                         }
-
-                        // 2) في يوم المناسبة نفسه
-                        scheduleEventReminder(
-                            `islamic-${nextEvent.key}-day`,
-                            'تذكير مناسبة إسلامية',
-                            `${nextEvent.name} اليوم بإذن الله`,
-                            nextEvent.daysUntil
-                        );
 
                         startCountdown(nextEvent.daysUntil);
                     }
