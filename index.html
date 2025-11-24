@@ -1473,7 +1473,16 @@
 
         function loadFavorites() {
             const favoritesList = document.getElementById("favorites-list");
-            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            
+            // Sanitize favorites: remove any invalid or legacy entries
+            favorites = favorites.filter(f => {
+                if (!f || typeof f.date !== 'string') return false;
+                const d = new Date(f.date);
+                return !isNaN(d.getTime());
+            });
+            // Save back sanitized list
+            localStorage.setItem('favorites', JSON.stringify(favorites));
             
             favoritesList.innerHTML = '';
             
@@ -1482,18 +1491,20 @@
                 return;
             }
             
-            favorites.forEach(favorite => {
+            favorites.forEach((favorite, index) => {
                 const dateObj = new Date(favorite.date);
                 const formattedDate = formatArabicDate(dateObj);
+                const elapsedText = getElapsedSinceDate(dateObj);
                 
                 const div = document.createElement('div');
                 div.className = 'favorite-item';
                 div.innerHTML = `
                     <div>
                         <span onclick="selectFavoriteDate('${favorite.date}')">${formattedDate}</span>
+                        <div class="favorite-note">${elapsedText}</div>
                         ${favorite.note ? `<div class="favorite-note">${favorite.note}</div>` : ''}
                     </div>
-                    <button onclick="removeFavorite('${favorite.date}')" class="remove-btn" title="حذف">❌</button>
+                    <button onclick="removeFavorite(${index})" class="remove-btn" title="حذف">❌</button>
                 `;
                 favoritesList.appendChild(div);
             });
@@ -1504,10 +1515,12 @@
             convertDate();
         }
 
-        function removeFavorite(date) {
+        function removeFavorite(index) {
             if (confirm('هل أنت متأكد من حذف هذا التاريخ من المفضلة؟')) {
                 let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-                favorites = favorites.filter(f => f.date !== date);
+                if (index >= 0 && index < favorites.length) {
+                    favorites.splice(index, 1);
+                }
                 localStorage.setItem('favorites', JSON.stringify(favorites));
                 loadFavorites();
             }
@@ -1518,6 +1531,40 @@
                 localStorage.removeItem('favorites');
                 loadFavorites();
             }
+        }
+
+        function getElapsedSinceDate(startDate) {
+            const now = new Date();
+
+            // تأكد أن التاريخ صالح
+            if (isNaN(startDate.getTime())) {
+                return '';
+            }
+
+            // لا نحسب المدة إن كان التاريخ في المستقبل
+            if (startDate > now) {
+                return '';
+            }
+
+            const diffTime = now - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffMonths = Math.floor(diffDays / 30.44); // متوسط أيام الشهر
+            const diffYears = Math.floor(diffMonths / 12);
+            const remainingMonths = diffMonths % 12;
+            const remainingDays = Math.round(diffDays % 30.44);
+
+            let parts = [];
+            if (diffYears > 0) {
+                parts.push(`${diffYears} سنة`);
+            }
+            if (remainingMonths > 0) {
+                parts.push(`${remainingMonths} شهر`);
+            }
+            if (remainingDays > 0 || parts.length === 0) {
+                parts.push(`${remainingDays} يوم`);
+            }
+
+            return `مضى: ${parts.join(' و ')}`;
         }
 
         function calculateDifference() {
