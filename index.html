@@ -922,6 +922,24 @@
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
             margin-top: 20px;
+            max-height: 320px;           /* ارتفاع ثابت للقسم */
+            overflow-y: auto;            /* شريط تمرير رأسي */
+            padding-right: 4px;          /* مساحة صغيرة لشريط التمرير */
+        }
+
+        /* تنسيق شريط التمرير لقسم المناسبات فقط (يدعم WebKit) */
+        .events-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .events-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .events-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 10px;
         }
 
         .event-card {
