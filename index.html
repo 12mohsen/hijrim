@@ -1215,6 +1215,25 @@
                 </div>
             </div>
         </div>
+
+        <!-- Cultural Events Section -->
+        <div class="events-section">
+            <h2>الفعاليات الثقافية والمعارض</h2>
+            <div class="events-list">
+                <div class="event-card">
+                    <h3>معرض الرياض الدولي للكتاب 2025</h3>
+                    <p id="riyadh-bookfair">-</p>
+                </div>
+                <div class="event-card">
+                    <h3>معرض جدة الدولي للكتاب 2025</h3>
+                    <p id="jeddah-bookfair">-</p>
+                </div>
+                <div class="event-card">
+                    <h3>اليوم العالمي للغة العربية</h3>
+                    <p id="arabic-language-day">-</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Add Modal for Notes -->
@@ -1804,6 +1823,85 @@
             saudiFoundingDay: { month: 2, day: 22, name: 'يوم التأسيس' }             // 22 February
         };
 
+        // Cultural Events (Gregorian)
+        const culturalEvents2025 = {
+            riyadhBookFair: {
+                name: 'معرض الرياض الدولي للكتاب 2025',
+                // يبدأ 2 أكتوبر 2025
+                start: new Date(2025, 9, 2),  // شهر 10 (أكتوبر) = index 9
+                end: new Date(2025, 9, 11)
+            },
+            jeddahBookFair: {
+                name: 'معرض جدة الدولي للكتاب 2025',
+                // التاريخ التقريبي بناءً على دورة 2024 (12 ديسمبر)
+                start: new Date(2025, 11, 12), // ديسمبر = index 11
+                end: new Date(2025, 11, 20)
+            }
+        };
+
+        function updateCulturalEvents() {
+            const now = new Date();
+
+            // Helper: نص الفرق بالأيام
+            function diffText(targetDate, label) {
+                const oneDay = 1000 * 60 * 60 * 24;
+                const diffDays = Math.ceil((targetDate.getTime() - now.getTime()) / oneDay);
+
+                if (diffDays > 0) {
+                    return `${label} بعد ${diffDays} يوم`;
+                } else if (diffDays === 0) {
+                    return `${label} اليوم`;
+                } else {
+                    return `${label} - انتهت`;
+                }
+            }
+
+            // معرض الرياض الدولي للكتاب 2025
+            const riyadhEl = document.getElementById('riyadh-bookfair');
+            if (riyadhEl) {
+                const ev = culturalEvents2025.riyadhBookFair;
+                if (now < ev.start) {
+                    riyadhEl.textContent = diffText(ev.start, 'من 2 أكتوبر إلى 11 أكتوبر 2025 - متبقٍ');
+                } else if (now >= ev.start && now <= ev.end) {
+                    riyadhEl.textContent = 'معرض الرياض الدولي للكتاب 2025 - الفعالية قائمة الآن من 2 إلى 11 أكتوبر 2025';
+                } else {
+                    riyadhEl.textContent = 'معرض الرياض الدولي للكتاب 2025 - انتهت الفعالية (2 إلى 11 أكتوبر 2025)';
+                }
+            }
+
+            // معرض جدة الدولي للكتاب 2025 (تاريخ تقريبي 12 ديسمبر)
+            const jeddahEl = document.getElementById('jeddah-bookfair');
+            if (jeddahEl) {
+                const ev = culturalEvents2025.jeddahBookFair;
+                if (now < ev.start) {
+                    jeddahEl.textContent = diffText(ev.start, 'من 12 ديسمبر (تاريخ تقريبي) - متبقٍ');
+                } else if (now >= ev.start && now <= ev.end) {
+                    jeddahEl.textContent = 'معرض جدة الدولي للكتاب 2025 - الفعالية قائمة تقريبًا حول 12 ديسمبر (تاريخ تقريبي)';
+                } else {
+                    jeddahEl.textContent = 'معرض جدة الدولي للكتاب 2025 - يُقام تقريبًا في ديسمبر، انتهت دورة 2025 المتوقعة';
+                }
+            }
+
+            // اليوم العالمي للغة العربية (18 ديسمبر من كل عام)
+            const arabicDayEl = document.getElementById('arabic-language-day');
+            if (arabicDayEl) {
+                const currentYear = now.getFullYear();
+                let target = new Date(currentYear, 11, 18); // 18 ديسمبر
+                if (target < now) {
+                    target = new Date(currentYear + 1, 11, 18);
+                }
+
+                const oneDay = 1000 * 60 * 60 * 24;
+                const diffDays = Math.ceil((target.getTime() - now.getTime()) / oneDay);
+
+                if (diffDays > 0) {
+                    arabicDayEl.textContent = `اليوم العالمي للغة العربية (18 ديسمبر) بعد ${diffDays} يوم`;
+                } else {
+                    arabicDayEl.textContent = 'اليوم العالمي للغة العربية اليوم (18 ديسمبر)';
+                }
+            }
+        }
+
         async function updateIslamicEvents() {
             try {
                 const now = new Date();
@@ -1937,9 +2035,12 @@
             updateIslamicEvents();
             // Update national events
             updateNationalEvents();
+            // Update cultural events
+            updateCulturalEvents();
             // Update events every day
             setInterval(updateIslamicEvents, 86400000);
             setInterval(updateNationalEvents, 86400000);
+            setInterval(updateCulturalEvents, 86400000);
         });
 
         function toggleReminders() {
